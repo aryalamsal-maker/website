@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Storage System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            display: none;
+        }
+
+        .input-section.active {
+            display: block;
+        }
+
+        .person-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .person-btn {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: capitalize;
+        }
+
+        .person-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .person-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .sentence-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .sentence-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .display-section {
+            text-align: center;
+        }
+
+        .sentence-display {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .sentence-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #495057;
+            font-style: italic;
+        }
+
+        .sentence-author {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .random-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .person-selector {
+                justify-content: center;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Sentence Storage System</h1>
+            <p>Store and randomly display sentences from Shreejal, Aaditya, Sworna, and Arya</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('input')">📝 Add Sentences</button>
+            <button class="tab" onclick="switchTab('display')">🎲 Random Display</button>
+        </div>
+
+        <div class="content">
+            <!-- Input Section -->
+            <div id="input-section" class="input-section active">
+                <div class="person-selector">
+                    <button class="person-btn active" onclick="selectPerson('shreejal')">Shreejal</button>
+                    <button class="person-btn" onclick="selectPerson('aaditya')">Aaditya</button>
+                    <button class="person-btn" onclick="selectPerson('sworna')">Sworna</button>
+                    <button class="person-btn" onclick="selectPerson('arya')">Arya</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="sentence-input">Enter a sentence:</label>
+                    <textarea id="sentence-input" class="sentence-input" placeholder="Type your sentence here..."></textarea>
+                </div>
+
+                <button class="add-btn" onclick="addSentence()">Add Sentence</button>
+            </div>
+
+            <!-- Display Section -->
+            <div id="display-section" class="input-section">
+                <div class="sentence-display">
+                    <div id="sentence-content" class="empty-state">
+                        Click "Get Random Sentence" to start!
+                    </div>
+                </div>
+
+                <div class="control-buttons">
+                    <button class="control-btn random-btn" onclick="getRandomSentence()">🎲 Get Random Sentence</button>
+                    <button class="control-btn next-btn" onclick="getNextSentence()" disabled>➡️ Next Sentence</button>
+                </div>
+
+                <div class="stats">
+                    <h3>📊 Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-sentences">0</div>
+                            <div class="stat-label">Total Sentences</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sentences-shown">0</div>
+                            <div class="stat-label">Sentences Shown</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="remaining-unique">0</div>
+                            <div class="stat-label">Remaining Unique</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GitHub configuration
+        const GITHUB_USERNAME = 'aryalamsal-maker';
+        const GITHUB_REPO = 'website';
+        const GITHUB_BRANCH = 'main';
+        const SENTENCES_FILE = 'sentences.json';
+
+        // Data storage
+        let sentences = {
+            shreejal: [],
+            aaditya: [],
+            sworna: [],
+            arya: []
+        };
+
+        let currentPerson = 'shreejal';
+        let displayedSentences = [];
+        let currentSentence = null;
+        let fileSha = null; // For GitHub API updates
+
+        // Initialize
+        async function init() {
+            await loadSentencesFromGitHub();
+            updateStats();
+        }
+
+        // GitHub API functions
+        async function loadSentencesFromGitHub() {
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${SENTENCES_FILE}`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.sha;
+                    const content = atob(data.content);
+                    sentences = JSON.parse(content);
+                    console.log('Sentences loaded from GitHub');
+                } else if (response.status === 404) {
+                    // File doesn't exist yet, create it
+                    await saveSentencesToGitHub();
+                    console.log('Created new sentences file on GitHub');
+                } else {
+                    console.error('Error loading sentences:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error loading sentences from GitHub:', error);
+            }
+        }
+
+        async function saveSentencesToGitHub() {
+            try {
+                const content = btoa(JSON.stringify(sentences, null, 2));
+                const url = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${SENTENCES_FILE}`;
+                
+                const payload = {
+                    message: 'Update sentences data',
+                    content: content,
+                    branch: GITHUB_BRANCH
+                };
+
+                if (fileSha) {
+                    payload.sha = fileSha;
+                }
+
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.content.sha;
+                    console.log('Sentences saved to GitHub');
+                    return true;
+                } else {
+                    console.error('Error saving sentences:', response.statusText);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error saving sentences to GitHub:', error);
+                return false;
+            }
+        }
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.input-section');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-section`).classList.add('active');
+
+            if (tab === 'display') {
+                updateStats();
+            }
+        }
+
+        // Person selection
+        function selectPerson(person) {
+            currentPerson = person;
+            
+            const buttons = document.querySelectorAll('.person-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.querySelector(`[onclick="selectPerson('${person}')"]`).classList.add('active');
+        }
+
+        // Add sentence
+        async function addSentence() {
+            const input = document.getElementById('sentence-input');
+            const sentence = input.value.trim();
+
+            if (!sentence) {
+                alert('Please enter a sentence!');
+                return;
+            }
+
+            // Disable button during save
+            const addBtn = document.querySelector('.add-btn');
+            addBtn.disabled = true;
+            addBtn.textContent = 'Saving...';
+
+            sentences[currentPerson].push(sentence);
+            
+            const saved = await saveSentencesToGitHub();
+            
+            if (saved) {
+                input.value = '';
+                alert(`Sentence added for ${currentPerson.charAt(0).toUpperCase() + currentPerson.slice(1)}!`);
+                updateStats();
+            } else {
+                // Remove from local storage if save failed
+                sentences[currentPerson].pop();
+                alert('Error saving sentence. Please try again.');
+            }
+
+            // Re-enable button
+            addBtn.disabled = false;
+            addBtn.textContent = 'Add Sentence';
+        }
+
+        // Get all sentences as a flat array with person info
+        function getAllSentences() {
+            const allSentences = [];
+            for (const person in sentences) {
+                sentences[person].forEach(sentence => {
+                    allSentences.push({ text: sentence, author: person });
+                });
+            }
+            return allSentences;
+        }
+
+        // Get random sentence
+        function getRandomSentence() {
+            const allSentences = getAllSentences();
+            
+            if (allSentences.length === 0) {
+                document.getElementById('sentence-content').innerHTML = 
+                    '<div class="empty-state">No sentences available. Add some sentences first!</div>';
+                return;
+            }
+
+            // Reset if we've shown 50 or more sentences
+            if (displayedSentences.length >= 50) {
+                displayedSentences = [];
+            }
+
+            // Find sentences not recently shown
+            const availableSentences = allSentences.filter(sentence => 
+                !displayedSentences.some(displayed => 
+                    displayed.text === sentence.text && displayed.author === sentence.author
+                )
+            );
+
+            let selectedSentence;
+            
+            // If no unique sentences left, reset the history but keep last 10
+            if (availableSentences.length === 0) {
+                displayedSentences = displayedSentences.slice(-10);
+                const newAvailable = allSentences.filter(sentence => 
+                    !displayedSentences.some(displayed => 
+                        displayed.text === sentence.text && displayed.author === sentence.author
+                    )
+                );
+                selectedSentence = newAvailable[Math.floor(Math.random() * newAvailable.length)];
+            } else {
+                selectedSentence = availableSentences[Math.floor(Math.random() * availableSentences.length)];
+            }
+
+            displaySentence(selectedSentence);
+            displayedSentences.push(selectedSentence);
+            currentSentence = selectedSentence;
+
+            // Enable next button
+            document.querySelector('.next-btn').disabled = false;
+            
+            updateStats();
+        }
+
+        // Get next sentence
+        function getNextSentence() {
+            getRandomSentence();
+        }
+
+        // Display sentence
+        function displaySentence(sentence) {
+            const content = document.getElementById('sentence-content');
+            content.innerHTML = `
+                <div>
+                    <div class="sentence-text">"${sentence.text}"</div>
+                    <div class="sentence-author">— ${sentence.author.charAt(0).toUpperCase() + sentence.author.slice(1)}</div>
+                </div>
+            `;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const allSentences = getAllSentences();
+            const totalSentences = allSentences.length;
+            const sentencesShown = displayedSentences.length;
+            
+            // Calculate remaining unique sentences
+            const availableSentences = allSentences.filter(sentence => 
+                !displayedSentences.some(displayed => 
+                    displayed.text === sentence.text && displayed.author === sentence.author
+                )
+            );
+            const remainingUnique = availableSentences.length;
+
+            document.getElementById('total-sentences').textContent = totalSentences;
+            document.getElementById('sentences-shown').textContent = sentencesShown;
+            document.getElementById('remaining-unique').textContent = remainingUnique;
+        }
+
+        // Handle Enter key in textarea
+        document.getElementById('sentence-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addSentence();
+            }
+        });
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
